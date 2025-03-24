@@ -1,12 +1,14 @@
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { useState } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Import icons
 
 interface WeeklyCalendarProps {
   selectedDate: string;
   setSelectedDate: (date: string) => void;
+  themeColor?: 'blue' | 'orange' | 'red' | 'green'; // Restrict themeColor to specific keys
 }
 
-export default function WeeklyCalendar({ selectedDate, setSelectedDate }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeColor = 'blue' }: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date(selectedDate)); // Track the current week
 
   const startOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 0 }); // Week starts on Sunday
@@ -24,43 +26,73 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate }: Weekly
     setSelectedDate(format(nextWeek, 'yyyy-MM-dd')); // Update selected date to the first day of the new week
   };
 
+  const themeClasses = {
+    blue: 'text-blue-500 bg-blue-500 border-blue-500',
+    orange: 'text-orange-500 bg-orange-500 border-orange-500',
+    red: 'text-red-500 bg-red-500 border-red-500',
+    green: 'text-green-500 bg-green-500 border-green-500',
+  };
+
+  const selectedTheme = themeClasses[themeColor] || themeClasses.blue;
+
   return (
-    <div>
+    <div className="text-center">
+      {/* Month and Year */}
+      <p className={`text-lg font-bold ${selectedTheme.split(' ')[0]} mb-4`}>
+        {format(startOfCurrentWeek, 'MMMM yyyy')}
+      </p>
+
       {/* Week Navigation */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center my-4">
+        {/* Previous Button */}
         <button
           onClick={handlePreviousWeek}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className={`w-10 h-10 flex items-center justify-center rounded-full ${
+            themeColor === 'blue'
+              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+              : themeColor === 'orange'
+              ? 'bg-orange-500 hover:bg-orange-600 text-white'
+              : themeColor === 'red'
+              ? 'bg-red-500 hover:bg-red-600 text-white'
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          }`}
         >
-          Previous Week
+          <FaChevronLeft className="text-lg" /> {/* Icon for Previous */}
         </button>
-        <p className="text-lg font-medium text-gray-700">
-          {format(startOfCurrentWeek, 'MMM d')} - {format(addDays(startOfCurrentWeek, 6), 'MMM d')}
-        </p>
+
+        {/* Days of the Week */}
+        <div className="flex gap-4">
+          {daysOfWeek.map((day) => (
+            <div
+              key={day.toISOString()}
+              onClick={() => setSelectedDate(format(day, 'yyyy-MM-dd'))} // Update selected date
+              className={`flex flex-col items-center justify-center w-14 h-14 cursor-pointer rounded-full transition-all duration-200 ${
+                isSameDay(day, new Date(selectedDate))
+                  ? `${selectedTheme} text-white font-bold`
+                  : 'text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <p className="text-sm font-medium">{format(day, 'EEE')}</p> {/* Day abbreviation (e.g., Sun, Mon) */}
+              <p className="text-lg font-semibold">{format(day, 'd')}</p> {/* Day number */}
+            </div>
+          ))}
+        </div>
+
+        {/* Next Button */}
         <button
           onClick={handleNextWeek}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className={`w-10 h-10 flex items-center justify-center rounded-full ${
+            themeColor === 'blue'
+              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+              : themeColor === 'orange'
+              ? 'bg-orange-500 hover:bg-orange-600 text-white'
+              : themeColor === 'red'
+              ? 'bg-red-500 hover:bg-red-600 text-white'
+              : 'bg-green-500 hover:bg-green-600 text-white'
+          }`}
         >
-          Next Week
+          <FaChevronRight className="text-lg" /> {/* Icon for Next */}
         </button>
-      </div>
-
-      {/* Weekly Calendar */}
-      <div className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow-md mb-6">
-        {daysOfWeek.map((day) => (
-          <div
-            key={day.toISOString()}
-            onClick={() => setSelectedDate(format(day, 'yyyy-MM-dd'))} // Update selected date
-            className={`flex flex-col items-center justify-center w-16 h-20 cursor-pointer rounded-lg ${
-              isSameDay(day, new Date(selectedDate))
-                ? 'bg-blue-600 text-white font-bold'
-                : 'bg-white text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <p className="text-sm">{format(day, 'EEE')}</p> {/* Day abbreviation (e.g., Sun, Mon) */}
-            <p className="text-lg">{format(day, 'd')}</p> {/* Day number */}
-          </div>
-        ))}
       </div>
     </div>
   );

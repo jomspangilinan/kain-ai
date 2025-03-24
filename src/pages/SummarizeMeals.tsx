@@ -89,7 +89,7 @@ export default function SummarizeMealsWithAI() {
       </div>
 
       {/* Weekly Calendar */}
-      <WeeklyCalendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+      <WeeklyCalendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} themeColor='blue' />
 
       {/* Grouped Meals */}
       {Object.entries(groupedMeals).map(([time, meals]) => (
