@@ -40,7 +40,7 @@ export default function ChatBot() {
     try {
       const payload: any = {
         messages: [
-          { role: 'system', content: 'You are a nutritionist. You need to breakdown the ingredients calories and macros of all the food I will be sending to you. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
+          { role: 'system', content: 'You are a nutritionist. You need to breakdown the ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
           {
             role: 'user',
             content: [
