@@ -110,9 +110,23 @@ export default function SummarizeMealsWithAI() {
               >
                 {/* Icon or Image */}
                 <div className="flex-shrink-0">
-                  {time === 'Breakfast' && <FaCoffee className="text-yellow-500 text-3xl" />}
-                  {time === 'Lunch' && <FaUtensils className="text-blue-500 text-3xl" />}
-                  {time === 'Dinner' && <FaDrumstickBite className="text-red-500 text-3xl" />}
+                  {time === 'Breakfast' && <div className="flex-shrink-0">
+                  <img src={`https://nenaswellnesscorner.com/wp-content/uploads/2023/07/Oatmeal-with-fruit-n1.jpg`}
+                    alt={`${meal.time} placeholder`}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                </div>}
+                  {time === 'Lunch' && <div className="flex-shrink-0">
+                <img src={`https://www.wellseasonedstudio.com/wp-content/uploads/2023/04/Grilled-chicken-salad-with-cucumbers-and-creamy-garlic-dressing-on-a-plate.jpg`} 
+                  alt={`${meal.time} placeholder`}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              </div>}
+                  {time === 'Dinner' && <div className="flex-shrink-0">
+                <img src={`https://img.taste.com.au/xZCVddHQ/taste/2016/12/steamed-salmon-with-spring-vegetables-118993-2.jpg`} 
+                  alt={`${meal.time} placeholder`}
+                  className="w-12 h-12 rounded-full object-cover"/>
+              </div>}
                 </div>
                 {/* Meal Info */}
                 <div className="flex-1">
