@@ -118,6 +118,8 @@ export default function ChatBotV2() {
         const mealDetailsResult = await parsedMealDetails
         setMealDetails(mealDetailsResult)
       }
+
+      console.log(messages)
     } catch (error) {
       console.error('Error communicating with Azure OpenAI:', error)
       setMessages((prev) => [...prev, { sender: 'bot', text: 'Something went wrong. Please try again.' }])
