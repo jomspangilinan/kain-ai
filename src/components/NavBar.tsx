@@ -14,6 +14,11 @@ export default function NavBar() {
             </Link>
           </li>
           <li>
+            <Link to="/chatbotv2" className="hover:underline">
+              💬 ChatbotV2
+            </Link>
+          </li>
+          <li>
             <Link to="/summarize" className="hover:underline">
               🌟 Summarize Meals
             </Link>
