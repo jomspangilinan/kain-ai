@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { AzureOpenAI } from 'openai'
 import ReactMarkdown from 'react-markdown'
+import { FaUtensils, FaAppleAlt, FaInfoCircle, FaEdit } from 'react-icons/fa'
 
 type Message = {
   sender: 'user' | 'bot'
@@ -75,7 +76,7 @@ export default function ChatBotV2() {
     try {
         const payload: any = {
             messages: [
-              { role: 'system', content: 'You are a nutritionist. You need to breakdown the ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
+              { role: 'system', content: 'You are a nutritionist. You need to breakdown the RAW ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list, SPECIFY THE 100 GRAMS. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
               {
                 role: 'user',
                 content: [
@@ -209,6 +210,44 @@ export default function ChatBotV2() {
     })
   }
 
+  const handleEditPer100Grams = (key: string, value: string) => {
+    const newValue = prompt(`Edit value for ${key}:`, value)
+    if (newValue) {
+      setMealDetails((prev) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          per100grams: {
+            ...prev.per100grams,
+            [key]: newValue,
+          },
+        }
+      })
+    }
+  }
+  
+  const handleEditIngredient = (ingredient: string, details: any) => {
+    const newCalories = prompt(`Edit calories for ${ingredient}:`, details.calories)
+    const newProtein = prompt(`Edit protein for ${ingredient}:`, details.protein)
+    const newFat = prompt(`Edit fat for ${ingredient}:`, details.fat)
+    const newCarbs = prompt(`Edit carbohydrates for ${ingredient}:`, details.carbohydrates)
+  
+    setMealDetails((prev) => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        ingredientsBreakdown: {
+          ...prev.ingredientsBreakdown,
+          [ingredient]: {
+            calories: newCalories || details.calories,
+            protein: newProtein || details.protein,
+            fat: newFat || details.fat,
+            carbohydrates: newCarbs || details.carbohydrates,
+          },
+        },
+      }
+    })
+  }
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
@@ -218,8 +257,11 @@ export default function ChatBotV2() {
       {/* Centered Container with Margins */}
       <div className="container mx-auto my-6 bg-white rounded-lg shadow-lg flex overflow-hidden">
         {/* Sidebar for Meal Details */}
+        
         <div className="w-1/3 bg-blue-50 border-r p-4 overflow-y-auto">
-  <h2 className="text-2xl font-bold text-blue-600 mb-4">Meal Breakdown</h2>
+  <h2 className="text-2xl font-bold text-blue-600 mb-4 flex items-center gap-2">
+    <FaUtensils className="text-blue-600" /> Meal Breakdown
+  </h2>
   {mealDetails ? (
     <div className="space-y-4">
       {/* Dish Name */}
@@ -230,31 +272,72 @@ export default function ChatBotV2() {
 
       {/* Per 100 Grams Breakdown */}
       <div>
-        <h4 className="text-md font-bold text-gray-700 mb-2">Per 100 Grams:</h4>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li><strong>Calories:</strong> {mealDetails.per100grams.calories}</li>
-          <li><strong>Protein:</strong> {mealDetails.per100grams.protein}</li>
-          <li><strong>Fat:</strong> {mealDetails.per100grams.fat}</li>
-          <li><strong>Carbohydrates:</strong> {mealDetails.per100grams.carbohydrates}</li>
-        </ul>
+        <h4 className="text-md font-bold text-gray-700 mb-2 flex items-center gap-2">
+          <FaAppleAlt className="text-green-600" /> Per 100 Grams:
+        </h4>
+        <table className="table-auto w-full text-sm text-gray-600 border-collapse border border-gray-300">
+          <thead>
+            <tr>
+              <th className="border border-gray-300 px-2 py-1 text-left">Nutrient</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Value</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(mealDetails.per100grams).map(([key, value]) => (
+              <tr key={key}>
+                <td className="border border-gray-300 px-2 py-1 capitalize">{key}</td>
+                <td className="border border-gray-300 px-2 py-1">{value}</td>
+                <td className="border border-gray-300 px-2 py-1">
+                  <button
+                    onClick={() => handleEditPer100Grams(key, value)}
+                    className="text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    <FaEdit /> Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Ingredients Breakdown */}
       <div>
-        <h4 className="text-md font-bold text-gray-700 mb-2">Ingredients Breakdown:</h4>
-        <ul className="text-sm text-gray-600 space-y-2">
-          {Object.entries(mealDetails.ingredientsBreakdown).map(([ingredient, details]) => (
-            <li key={ingredient} className="border-b pb-2">
-              <strong className="text-gray-800">{ingredient}:</strong>
-              <ul className="ml-4 space-y-1">
-                <li><strong>Calories:</strong> {details.calories}</li>
-                <li><strong>Protein:</strong> {details.protein}</li>
-                <li><strong>Fat:</strong> {details.fat}</li>
-                <li><strong>Carbohydrates:</strong> {details.carbohydrates}</li>
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <h4 className="text-md font-bold text-gray-700 mb-2 flex items-center gap-2">
+          <FaInfoCircle className="text-yellow-600" /> Ingredients Breakdown:
+        </h4>
+        <table className="table-auto w-full text-sm text-gray-600 border-collapse border border-gray-300">
+          <thead>
+            <tr>
+              <th className="border border-gray-300 px-2 py-1 text-left">Ingredient</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Calories</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Protein</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Fat</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Carbs</th>
+              <th className="border border-gray-300 px-2 py-1 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(mealDetails.ingredientsBreakdown).map(([ingredient, details]) => (
+              <tr key={ingredient}>
+                <td className="border border-gray-300 px-2 py-1">{ingredient}</td>
+                <td className="border border-gray-300 px-2 py-1">{details.calories}</td>
+                <td className="border border-gray-300 px-2 py-1">{details.protein}</td>
+                <td className="border border-gray-300 px-2 py-1">{details.fat}</td>
+                <td className="border border-gray-300 px-2 py-1">{details.carbohydrates}</td>
+                <td className="border border-gray-300 px-2 py-1">
+                  <button
+                    onClick={() => handleEditIngredient(ingredient, details)}
+                    className="text-blue-600 hover:underline flex items-center gap-1"
+                  >
+                    <FaEdit /> Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Note */}
@@ -266,7 +349,6 @@ export default function ChatBotV2() {
     <p className="text-gray-500">No meal details available. Ask the bot for a meal breakdown.</p>
   )}
 </div>
-
         {/* ChatBot Section */}
         <div className="w-2/3 flex flex-col">
           <div className="flex-1 p-4 overflow-y-auto space-y-3">
