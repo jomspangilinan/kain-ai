@@ -37,11 +37,11 @@ export default function ChatBot() {
     try {
       const payload: any = {
         messages: [
-          { role: 'system', content: 'You are a nutritionist. You need to breakdown the calories of all the food I will be sending to you. Start with what food is it? Then you break it down per grams. Always use grams.' },
+          { role: 'system', content: 'You are a nutritionist. You need to breakdown the calories of all the food I will be sending to you. Start with what food is it? Then you break it down per grams. Always use grams. Make sure that you are breaking it down per 100 grams.' },
           {
             role: 'user',
             content: [
-              { type: 'text', text: input || 'This is my meal, breakdown for me for food log.' },
+              { type: 'text', text: input || 'This is my meal, breakdown for me for food log. Make sure you break it down per 100 grams' },
             ],
           },
         ],
