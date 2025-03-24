@@ -3,7 +3,7 @@ import { useState } from 'react'
 export default function ImageUpload() {
   const [image, setImage] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
-
+  console.log(image)
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
