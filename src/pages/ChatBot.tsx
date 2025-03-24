@@ -18,12 +18,13 @@ if (!endpoint || !apiKey || !deployment) {
   throw new Error("Missing Azure OpenAI configuration in environment variables.")
 }
 
-const openAiClient = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment,  dangerouslyAllowBrowser: true })
+const openAiClient = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment, dangerouslyAllowBrowser: true })
 
 export default function ChatBot() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isTyping, setIsTyping] = useState<boolean>(false) // Typing animation state
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   const sendMessage = async () => {
@@ -34,29 +35,31 @@ export default function ChatBot() {
     setInput('')
     setImagePreview(null)
 
+    setIsTyping(true) // Show typing animation
+
     try {
       const payload: any = {
         messages: [
-          { role: 'system', content: 'You are a nutritionist. You need to breakdown the calories of all the food I will be sending to you. Start with what food is it? Then you break it down per grams. Always use grams. Make sure that you are breaking it down per 100 grams.' },
+          { role: 'system', content: 'You are a nutritionist. You need to breakdown the ingredients calories and macros of all the food I will be sending to you. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
           {
             role: 'user',
             content: [
-              { type: 'text', text: input || 'This is my meal, breakdown for me for food log. Make sure you break it down per 100 grams' },
+              { type: 'text', text: input || 'This is my meal, breakdown for me for food log.' },
             ],
           },
         ],
         max_tokens: 2000,
-      };
-        if (imagePreview) {
-        const response = await fetch(imagePreview);
-        const blob = await response.blob();
-        const base64Image = await convertBlobToBase64(blob); // Convert the image to base64
+      }
+      if (imagePreview) {
+        const response = await fetch(imagePreview)
+        const blob = await response.blob()
+        const base64Image = await convertBlobToBase64(blob) // Convert the image to base64
         payload.messages[1].content.push({
           type: 'image_url',
           image_url: {
             url: base64Image, // Include the base64-encoded image in the payload
           },
-        });
+        })
       }
 
       console.log('Payload:', payload)
@@ -78,6 +81,8 @@ export default function ChatBot() {
     } catch (error) {
       console.error('Error communicating with Azure OpenAI:', error)
       setMessages((prev) => [...prev, { sender: 'bot', text: 'Something went wrong. Please try again.' }])
+    } finally {
+      setIsTyping(false) // Hide typing animation
     }
   }
 
@@ -90,6 +95,20 @@ export default function ChatBot() {
     if (file) {
       const imageUrl = URL.createObjectURL(file)
       setImagePreview(imageUrl)
+      e.target.value = '' // Reset the file input value to allow re-uploading the same file
+    }
+  }
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const items = e.clipboardData.items
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile()
+        if (file) {
+          const imageUrl = URL.createObjectURL(file)
+          setImagePreview(imageUrl)
+        }
+      }
     }
   }
 
@@ -108,7 +127,7 @@ export default function ChatBot() {
 
   return (
     <div className="w-full max-w-xl mx-auto mt-6 border rounded-xl shadow-md h-[700px] flex flex-col bg-gray-50">
-       <header className="mb-4 border-b pb-2">
+      <header className="mb-4 border-b pb-2">
         <h2 className="text-2xl font-semibold text-blue-600">💬 Chat with Your Nutrition Buddy</h2>
         <p className="text-gray-500 text-sm mt-1">
           Ask me about your meals, track calories, and get personalized insights.
@@ -138,6 +157,15 @@ export default function ChatBot() {
             )}
           </div>
         ))}
+        {isTyping && (
+          <div className="flex items-center gap-2">
+            <div className="typing-dots">
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -147,6 +175,7 @@ export default function ChatBot() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste} // Handle pasted images
           placeholder="Type your meal or ask something..."
           className="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none"
         />
