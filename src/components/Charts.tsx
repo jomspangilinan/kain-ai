@@ -18,7 +18,7 @@ import {
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const Charts: React.FC<ChartsProps> = ({ weight, calorieData }) => {
+const Charts: React.FC<ChartsProps> = ({ weight }) => {
   const weightData = {
     labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
     datasets: [
