@@ -36,14 +36,14 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeCol
   const selectedTheme = themeClasses[themeColor] || themeClasses.blue;
 
   return (
-    <div className="text-center">
+    <div className="text-center px-4">
       {/* Month and Year */}
       <p className={`text-lg font-bold ${selectedTheme.split(' ')[0]} mb-4`}>
         {format(startOfCurrentWeek, 'MMMM yyyy')}
       </p>
 
       {/* Week Navigation */}
-      <div className="flex justify-between items-center my-4">
+      <div className="flex justify-between items-center mb-4">
         {/* Previous Button */}
         <button
           onClick={handlePreviousWeek}
@@ -61,19 +61,19 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeCol
         </button>
 
         {/* Days of the Week */}
-        <div className="flex gap-4">
+        <div className="grid grid-cols-7 gap-2">
           {daysOfWeek.map((day) => (
             <div
               key={day.toISOString()}
               onClick={() => setSelectedDate(format(day, 'yyyy-MM-dd'))} // Update selected date
-              className={`flex flex-col items-center justify-center w-14 h-14 cursor-pointer rounded-full transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center w-12 h-12 cursor-pointer rounded-full transition-all duration-200 ${
                 isSameDay(day, new Date(selectedDate))
                   ? `${selectedTheme} text-white font-bold`
                   : 'text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <p className="text-sm font-medium">{format(day, 'EEE')}</p> {/* Day abbreviation (e.g., Sun, Mon) */}
-              <p className="text-lg font-semibold">{format(day, 'd')}</p> {/* Day number */}
+              <p className="text-xs font-medium">{format(day, 'EEE')}</p> {/* Day abbreviation (e.g., Sun, Mon) */}
+              <p className="text-sm font-semibold">{format(day, 'd')}</p> {/* Day number */}
             </div>
           ))}
         </div>

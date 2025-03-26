@@ -31,3 +31,7 @@ animation-delay: 0.4s;
     opacity: 1;
 }
 }
+
+.clip-header {
+    clip-path: ellipse(100% 100% at 50% 0%);
+  }

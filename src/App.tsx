@@ -6,11 +6,12 @@ import MaintainStreak from './pages/MaintainStreak';
 import ShareJourney from './pages/ShareJourney';
 import Header from './components/Header';
 import ChatBotV2 from './pages/ChatBotV2';
+import MobileIntegrated from './pages/MobileFirstBot';
 
 export default function App() {
   return (
     <div>
-      <NavBar />
+      {/*<NavBar />
       <Routes>
       <Route path="/" element={<Header />} />
         <Route path="/chatbot" element={<ChatBot />} />
@@ -18,7 +19,9 @@ export default function App() {
         <Route path="/summarize" element={<SummarizeMealsWithAI />} />
         <Route path="/streak" element={<MaintainStreak />} />
         <Route path="/share" element={<ShareJourney />} />
-      </Routes>
+        <Route path="/mobile" element={<MobileIntegrated />} />
+      </Routes>*/}
+      <MobileIntegrated />
     </div>
   );
 }
