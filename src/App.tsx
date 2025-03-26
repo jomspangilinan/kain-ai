@@ -1,11 +1,11 @@
-import { Routes, Route } from 'react-router-dom';
+/*import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import ChatBot from './pages/ChatBot';
 import SummarizeMealsWithAI from './pages/SummarizeMeals';
 import MaintainStreak from './pages/MaintainStreak';
 import ShareJourney from './pages/ShareJourney';
 import Header from './components/Header';
-import ChatBotV2 from './pages/ChatBotV2';
+import ChatBotV2 from './pages/ChatBotV2';*/
 import MobileIntegrated from './pages/MobileFirstBot';
 
 export default function App() {
