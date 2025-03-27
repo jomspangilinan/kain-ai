@@ -23,7 +23,6 @@ const GoalAndMacrosTracker: React.FC<GoalAndMacrosTrackerProps> = ({ caloriesCon
         slidesPerView={1}
         centeredSlides={true}
         spaceBetween={20}
-        modules={[Pagination, Navigation]}
         className="mySwiper"
       >
         {/* Calories Card */}

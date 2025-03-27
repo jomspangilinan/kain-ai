@@ -1,4 +1,7 @@
 import { Line } from 'react-chartjs-2';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Navigation } from 'swiper/modules';
+
 
 interface ChartsProps {
   weight: (number | null)[];
@@ -54,28 +57,38 @@ const Charts: React.FC<ChartsProps> = ({ weight, calorie }) => {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg mx-4 mt-4 mb-20 p-4 overflow-visible"> {/* Increased padding-bottom */}
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Weekly Charts</h2>
-
-      {/* Weight Check-In Chart */}
-      <div className="mt-6">
-        <h3 className="text-sm font-medium text-gray-600 mb-2 text-center">Weight Check-In</h3>
-        <div className="flex justify-center">
-          <div className="w-full max-w-lg h-64">
-            <Line data={weightData} options={chartOptions} />
+    <div className="overflow-visible"> {/* Increased padding-bottom */}
+      <Swiper
+        slidesPerView={1}
+        spaceBetween={20}
+        modules={[Pagination, Navigation]}
+        className="mySwiper"
+      >
+        <SwiperSlide>
+          {/* Weight Check-In Chart */}
+          <div className="bg-white shadow-md rounded-lg mx-4 mt-4 mb-20 p-4">
+            <h3 className="text-sm font-medium text-gray-600 mb-2 text-center">Weight Check-In</h3>
+            <div className="flex justify-center">
+              <div className="w-full max-w-lg h-64">
+                <Line data={weightData} options={chartOptions} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      {/* Calorie Intake Chart */}
-      <div className="mt-8">
-        <h3 className="text-sm font-medium text-gray-600 mb-2 text-center">Calorie Intake</h3>
-        <div className="flex justify-center">
-          <div className="w-full max-w-lg h-64">
-            <Line data={calorieChartData} options={chartOptions} />
+        </SwiperSlide>
+        <SwiperSlide>
+          {/* Calorie Intake Chart */}
+          <div className="bg-white shadow-md rounded-lg mx-4 mt-4 mb-20 p-4">
+            <h3 className="text-sm font-medium text-gray-600 mb-2 text-center">Calorie Intake</h3>
+            <div className="flex justify-center">
+              <div className="w-full max-w-lg h-64">
+                <Line data={calorieChartData} options={chartOptions} />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </SwiperSlide>
+      </Swiper>
+
+
     </div>
   );
 };
