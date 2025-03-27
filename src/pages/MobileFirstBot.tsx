@@ -44,7 +44,7 @@ export default function MobileIntegrated() {
         calorieGoal={data.goal.calorieGoal}
         macros={data.macros}
       />
-      <Charts weight={getWeightsForDays(daysOfWeek)} calorie={getCaloriesForDays(daysOfWeek)} />
+      <Charts weight={getWeightsForDays(daysOfWeek)} calorie={getCaloriesForDays(daysOfWeek)} selectedDate={selectedDate} />
       {/* Footer Navigation */}
       <FooterNavigation onChatbotToggle={() => setIsChatOpen(!isChatOpen)} />
 
