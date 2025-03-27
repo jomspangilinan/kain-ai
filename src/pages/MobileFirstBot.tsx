@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import WeeklyCalendar from '../components/mobileWeeklyCalendar';
-//import GoalTracker from '../components/GoalTracker';
-//import MacroProgress from '../components/MacroProgress';
 import Charts from '../components/Charts';
 import { mockData } from '../data/mockData';
 
