@@ -190,6 +190,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onPaste={handlePaste} // Handle pasted images
           placeholder="Type your meal or ask something..."
           className="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none"
         />
