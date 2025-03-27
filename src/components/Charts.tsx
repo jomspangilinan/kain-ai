@@ -82,6 +82,13 @@ const Charts: React.FC<ChartsProps> = ({ weight, calorie, selectedDate }) => {
         display: true,
         position: 'top',
       },
+      tooltip: {
+        filter: (tooltipItem) => {
+          // Only show a tooltip if the data is not zero (and not null/undefined).
+          const yValue = tooltipItem.parsed.y;
+          return yValue !== 0 && yValue != null;
+        },
+      },
     },
     elements: {
       point: {
