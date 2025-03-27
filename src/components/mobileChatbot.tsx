@@ -8,9 +8,8 @@ interface ChatbotProps {
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   return (
     <div
-      className={`fixed inset-0 bg-white z-50 flex flex-col transform transition-transform duration-300 ${
-        isOpen ? 'translate-y-0' : 'translate-y-full'
-      }`}
+      className={`fixed inset-0 bg-white z-50 flex flex-col transform transition-transform duration-300 ${isOpen ? 'translate-y-0' : 'translate-y-full'
+        }`}
     >
       {/* Close Button */}
       <button

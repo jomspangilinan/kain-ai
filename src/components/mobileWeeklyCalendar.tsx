@@ -1,18 +1,30 @@
-import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
-import { useState } from 'react';
+import { format, startOfWeek, addDays, isSameDay, isToday } from 'date-fns';
+import { useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 interface WeeklyCalendarProps {
   selectedDate: string;
   setSelectedDate: (date: string) => void;
+  setDaysOfWeek?: (days: string[]) => void;
   themeColor?: 'blue' | 'orange' | 'red' | 'green';
 }
 
-export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeColor = 'blue' }: WeeklyCalendarProps) {
+export default function WeeklyCalendar({
+  selectedDate,
+  setSelectedDate,
+  themeColor = 'green',
+  setDaysOfWeek,
+}: WeeklyCalendarProps) {
   const [currentWeek, setCurrentWeek] = useState<Date>(new Date(selectedDate));
 
   const startOfCurrentWeek = startOfWeek(currentWeek, { weekStartsOn: 0 });
   const daysOfWeek = Array.from({ length: 7 }, (_, i) => addDays(startOfCurrentWeek, i));
+
+  useEffect(() => {
+    if (setDaysOfWeek) {
+      setDaysOfWeek(daysOfWeek.map((day) => format(day, 'yyyy-MM-dd')));
+    }
+  }, [currentWeek, setDaysOfWeek]);
 
   const handlePreviousWeek = () => {
     const previousWeek = addDays(currentWeek, -7);
@@ -36,7 +48,8 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeCol
   const selectedTheme = themeClasses[themeColor] || themeClasses.blue;
 
   return (
-    <div className="text-center px-4">
+    <div
+    className="bg-white shadow-md mx-4 rounded-lg text-center px-4 py-4 relative z-10 mb-4 mt-[-50px]">
       {/* Month and Year */}
       <p className={`text-lg font-bold ${selectedTheme.split(' ')[0]} mb-4`}>
         {format(startOfCurrentWeek, 'MMMM yyyy')}
@@ -58,12 +71,17 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeCol
             <div
               key={day.toISOString()}
               onClick={() => setSelectedDate(format(day, 'yyyy-MM-dd'))}
-              className={`flex flex-col items-center justify-center w-14 h-14 cursor-pointer rounded-full transition-all duration-200 ${
+              className={`relative flex flex-col items-center justify-center w-14 h-18 cursor-pointer rounded-full transition-all duration-200 ${
                 isSameDay(day, new Date(selectedDate))
                   ? `${selectedTheme} text-white font-bold`
                   : 'text-gray-700 hover:bg-gray-200'
               }`}
             >
+              {/* Circle for Today */}
+              {isToday(day) && (
+                <div className="absolute bottom-1 w-2 h-2 rounded-full"
+                style={{ backgroundColor: '#FF8989' }}/>
+              )}
               <p className="text-xs font-medium">{format(day, 'EEE')}</p>
               <p className="text-sm font-semibold">{format(day, 'd')}</p>
             </div>
@@ -71,12 +89,14 @@ export default function WeeklyCalendar({ selectedDate, setSelectedDate, themeCol
         </div>
 
         {/* Next Button */}
-        <button
-          onClick={handleNextWeek}
-          className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
-        >
-          <FaChevronRight className="text-lg text-gray-600" />
-        </button>
+        {!daysOfWeek.some((day) => isToday(day)) && (
+          <button
+            onClick={handleNextWeek}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300"
+          >
+            <FaChevronRight className="text-lg text-gray-600" />
+          </button>
+        )}
       </div>
     </div>
   );
