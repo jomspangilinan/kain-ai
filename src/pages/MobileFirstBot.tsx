@@ -1,22 +1,23 @@
 
 
-import { useState } from 'react';
-import WeeklyCalendar from '../components/mobileWeeklyCalendar';
+//import { useState } from 'react';
+//import WeeklyCalendar from '../components/mobileWeeklyCalendar';
 import Charts from '../components/Charts';
 import { mockData } from '../data/mockData';
 
 //import FooterNavigation from '../components/FooterNav';
 //import Chatbot from '../components/mobileChatbot';
-import Header from '../components/mobileHeader';
+//import Header from '../components/mobileHeader';
 import GoalAndMacrosTracker from '../components/GoalTracker';
 
-export default function MobileIntegrated() {
 
-  const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
-  const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
+interface MobileIntegratedProps {
+  selectedDate: string;
+  daysOfWeek: string[];
+}
+
+
+export default function MobileIntegrated({ selectedDate, daysOfWeek }: MobileIntegratedProps) {
 
   const data = mockData[selectedDate as keyof typeof mockData] || mockData['2025-03-26'];
 
@@ -36,9 +37,7 @@ export default function MobileIntegrated() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col">
-      <Header />
-      <WeeklyCalendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} setDaysOfWeek={setDaysOfWeek} />
+    <div className="bg-gray-100 flex flex-col">
       <GoalAndMacrosTracker
         caloriesConsumed={data.goal.caloriesConsumed}
         calorieGoal={data.goal.calorieGoal}

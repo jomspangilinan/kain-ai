@@ -137,10 +137,10 @@ const Charts: React.FC<ChartsProps> = ({ weight, calorie, selectedDate }) => {
   };
 
   // Card styling for each Swiper slide
-  const cardClass = `bg-white shadow-md rounded-lg mx-4 mt-4 mb-20 p-4 transition-transform duration-300`;
+  const cardClass = `bg-white shadow-md rounded-lg mx-4 mt-4 p-4 transition-transform duration-300`;
 
   return (
-    <div className="overflow-visible">
+    <div className="overflow-visible mb-20">
       <Swiper
         slidesPerView={1}
         spaceBetween={20}
