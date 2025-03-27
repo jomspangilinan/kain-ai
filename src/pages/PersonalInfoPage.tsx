@@ -11,6 +11,8 @@ import {
 import { useWindowSize } from 'react-use'
 import Confetti from 'react-confetti'
 
+import Picker from 'react-mobile-picker'
+
 type LifestyleOption = "sedentary" | "lightlyActive" | "active" | "veryActive";
 
 const PersonalInfoPage: React.FC = () => {
@@ -35,6 +37,22 @@ const PersonalInfoPage: React.FC = () => {
     // Step navigation
     const handleNext = () => setStep((prev) => prev + 1);
     const handleBack = () => setStep((prev) => (prev > 0 ? prev - 1 : 0));
+
+    //const [weight, setWeight] = useState(70.0); // Default weight
+
+    // Generate weight options (30.0 to 200.0 with 0.1 steps)
+    //const weightOptions = Array.from({ length: 1701 }, (_, i) => (30 + i * 0.1).toFixed(1));
+    const selections = {
+        title: ['1.', '2.', '3.', '4.'],
+        firstName: ['1', '2', '3'],
+        lastName: ['1', '2', '3', '4', '5']
+    }
+
+    const [pickerValue, setPickerValue] = useState({
+        title: '1.',
+        firstName: '2',
+        lastName: '3'
+    })
 
     // Framer Motion step transitions
     const stepVariants = {
@@ -139,6 +157,18 @@ const PersonalInfoPage: React.FC = () => {
                                 {formData.weight.toFixed(1)} kg
                             </div>
                         </div>
+                        <Picker value={pickerValue} onChange={setPickerValue}>
+                            {Object.keys(selections).map(name => (
+                                <Picker.Column key={name} name={name}>
+                                    {selections[name].map(option => (
+                                        <Picker.Item key={option} value={option}>
+                                            {option}
+                                        </Picker.Item>
+                                    ))}
+                                </Picker.Column>
+                            ))}
+                        </Picker>
+
                         <motion.button
                             {...buttonMotion}
                             onClick={handleNext}
