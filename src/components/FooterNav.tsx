@@ -1,6 +1,5 @@
 import { FaHome, FaUtensils, FaBook, FaRobot, FaUser } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom'; // Import NavLink for routing
-
 interface FooterNavigationProps {
   onChatbotToggle: () => void;
 }

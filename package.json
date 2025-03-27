@@ -16,6 +16,7 @@
     "chart.js": "^4.4.8",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "framer-motion": "^12.6.2",
     "install": "^0.13.0",
     "npm": "^11.2.0",
     "openai": "^4.89.0",

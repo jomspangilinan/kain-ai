@@ -5,13 +5,13 @@ import WeeklyCalendar from '../components/mobileWeeklyCalendar';
 import Charts from '../components/Charts';
 import { mockData } from '../data/mockData';
 
-import FooterNavigation from '../components/FooterNav';
-import Chatbot from '../components/mobileChatbot';
+//import FooterNavigation from '../components/FooterNav';
+//import Chatbot from '../components/mobileChatbot';
 import Header from '../components/mobileHeader';
 import GoalAndMacrosTracker from '../components/GoalTracker';
 
 export default function MobileIntegrated() {
-  const [isChatOpen, setIsChatOpen] = useState(false); // State to toggle chatbot interface
+
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -45,11 +45,7 @@ export default function MobileIntegrated() {
         macros={data.macros}
       />
       <Charts weight={getWeightsForDays(daysOfWeek)} calorie={getCaloriesForDays(daysOfWeek)} selectedDate={selectedDate} />
-      {/* Footer Navigation */}
-      <FooterNavigation onChatbotToggle={() => setIsChatOpen(!isChatOpen)} />
 
-      {/* Chatbot Component */}
-      <Chatbot isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 }

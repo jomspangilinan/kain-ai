@@ -5,6 +5,8 @@ import ReactMarkdown from 'react-markdown'
 import { FaPaperPlane } from 'react-icons/fa';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { IoIosAttach } from "react-icons/io";
+
+
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
