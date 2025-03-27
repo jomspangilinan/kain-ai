@@ -225,3 +225,23 @@ body {
     color: red;
     font-weight: bold;
 }
+
+/* Add this in your global CSS or a component-specific style file */
+.markdown table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    /* optional spacing */
+}
+
+.markdown th,
+.markdown td {
+    border: 1px solid #ccc;
+    /* table cell borders */
+    padding: 8px;
+    /* spacing inside cells */
+}
+
+/* Optionally, center the text in table headers */
+.markdown th {
+    text-align: center;
+}

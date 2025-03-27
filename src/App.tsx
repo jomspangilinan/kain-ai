@@ -11,7 +11,7 @@ import PersonalInfoPage from './pages/PersonalInfoPage';
 import FooterNavigation from './components/FooterNav';
 import Chatbot from './components/mobileChatbot';
 import { useState } from 'react';
-
+import SummarizeMealsWithAI from './pages/SummarizeMeals';
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false); // State to toggle chatbot interface
   return (
@@ -20,6 +20,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<MobileIntegrated />} />
           <Route path="/profile" element={<PersonalInfoPage />} />
+          <Route path="/diary" element={<SummarizeMealsWithAI />} />
         </Routes>}
       {/* Footer Navigation */}
       <FooterNavigation onChatbotToggle={() => setIsChatOpen(!isChatOpen)} />

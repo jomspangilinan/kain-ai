@@ -2,16 +2,15 @@ import React from 'react';
 import { useState, useRef, useEffect } from 'react'
 import { AzureOpenAI } from 'openai'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm' // <-- Import remarkGfm
 import { FaPaperPlane } from 'react-icons/fa';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { IoIosAttach } from "react-icons/io";
-
 
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 
 type Message = {
   sender: 'user' | 'bot'
@@ -19,7 +18,6 @@ type Message = {
   image?: string // Optional image URL for messages
 }
 
-// Load environment variables
 const endpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT
 const apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY
 const deployment = import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT_ID
@@ -35,7 +33,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [isTyping, setIsTyping] = useState<boolean>(false) // Typing animation state
+  const [isTyping, setIsTyping] = useState<boolean>(false)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   const sendMessage = async () => {
@@ -45,13 +43,26 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
     setMessages((prev) => [...prev, newMessage])
     setInput('')
     setImagePreview(null)
-
-    setIsTyping(true) // Show typing animation
+    setIsTyping(true)
 
     try {
       const payload: any = {
         messages: [
-          { role: 'system', content: 'You are a nutritionist. You need to breakdown the ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list. Start with what food is it? Then you break it down per 100 grams, you should specify the per 100 grams.' },
+          {
+            role: 'system',
+            content: `You are a nutritionist. 
+            You need to breakdown the ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list. 
+            Start with what food is it? 
+            Then you break it down per 100 grams, you should specify the per 100 grams.
+            I want you to use a table for breakdown:
+            | Ingredients    | Calories    | Protein    | Carbs    | Fats |
+            | -------- | ------- | ------- | ------- | ------- |
+            At the end, total everything and the suggested serving size like per cup whichever is easier to understand.
+            Make sure you know how the table works:
+            | Sample | Column1 | ... | ColumnN |
+            | ------ | ------- | --- | ------- |
+            `
+          },
           {
             role: 'user',
             content: [
@@ -64,16 +75,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       if (imagePreview) {
         const response = await fetch(imagePreview)
         const blob = await response.blob()
-        const base64Image = await convertBlobToBase64(blob) // Convert the image to base64
+        const base64Image = await convertBlobToBase64(blob)
         payload.messages[1].content.push({
           type: 'image_url',
           image_url: {
-            url: base64Image, // Include the base64-encoded image in the payload
+            url: base64Image,
           },
         })
       }
-
-      console.log('Payload:', payload)
 
       const completion = await openAiClient.chat.completions.create({
         model: 'gpt-4o-2024-05-13',
@@ -85,15 +94,13 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
         stop: null,
       })
 
-      console.log('Completion:', completion)
-
       const botReply = completion.choices?.[0]?.message?.content?.trim() || 'I could not process your request.'
       setMessages((prev) => [...prev, { sender: 'bot', text: botReply }])
     } catch (error) {
       console.error('Error communicating with Azure OpenAI:', error)
       setMessages((prev) => [...prev, { sender: 'bot', text: 'Something went wrong. Please try again.' }])
     } finally {
-      setIsTyping(false) // Hide typing animation
+      setIsTyping(false)
     }
   }
 
@@ -106,7 +113,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
     if (file) {
       const imageUrl = URL.createObjectURL(file)
       setImagePreview(imageUrl)
-      e.target.value = '' // Reset the file input value to allow re-uploading the same file
+      e.target.value = ''
     }
   }
 
@@ -160,7 +167,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
               }`}
           >
             {msg.sender === 'bot' ? (
-              <ReactMarkdown>{msg.text}</ReactMarkdown> // Render bot messages as Markdown
+              // Use the remarkGfm plugin to render tables, strikethrough, etc.
+              <div className="markdown">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {msg.text}
+                </ReactMarkdown></div>
             ) : (
               msg.text
             )}
@@ -192,7 +203,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          onPaste={handlePaste} // Handle pasted images
+          onPaste={handlePaste}
           placeholder="Type your meal or ask something..."
           className="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none"
         />
@@ -231,4 +242,5 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
     </div>
   )
 }
+
 export default Chatbot;
