@@ -7,7 +7,7 @@ interface FooterNavigationProps {
 
 const FooterNavigation: React.FC<FooterNavigationProps> = ({ onChatbotToggle }) => {
   return (
-    <footer className="bg-white shadow-md fixed bottom-0 left-0 right-0 flex justify-between items-center px-4 py-2">
+    <footer className="bg-white shadow-md fixed bottom-0 left-0 right-0 flex justify-between items-center px-4 py-2 z-49">
       {/* Home Icon */}
       <NavLink
         to="/"
