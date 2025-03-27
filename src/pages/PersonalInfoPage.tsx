@@ -158,9 +158,9 @@ const PersonalInfoPage: React.FC = () => {
                             </div>
                         </div>
                         <Picker value={pickerValue} onChange={setPickerValue}>
-                            {Object.keys(selections).map(name => (
+                            {Object.keys(selections).map((name) => (
                                 <Picker.Column key={name} name={name}>
-                                    {selections[name].map(option => (
+                                    {selections[name as keyof typeof selections].map((option) => (
                                         <Picker.Item key={option} value={option}>
                                             {option}
                                         </Picker.Item>
