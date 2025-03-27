@@ -8,7 +8,6 @@ const Header = () => {
         {/* Streak Icon */}
         <div className="flex items-center">
           <FaFire className="text-xl mr-2" />
-          <span className="text-sm font-medium">Streak: 5</span>
         </div>
 
         {/* App Name */}
