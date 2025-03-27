@@ -8,11 +8,14 @@ import {
     FaRunning,
     FaArrowLeft,
 } from "react-icons/fa";
+import { useWindowSize } from 'react-use'
+import Confetti from 'react-confetti'
 
 type LifestyleOption = "sedentary" | "lightlyActive" | "active" | "veryActive";
 
 const PersonalInfoPage: React.FC = () => {
     const [step, setStep] = useState(0);
+    const { width, height } = useWindowSize()
     const [formData, setFormData] = useState({
         name: "",
         weight: 70.0,    // allow decimal
@@ -83,9 +86,9 @@ const PersonalInfoPage: React.FC = () => {
                         className="flex flex-col items-center"
                     >
                         <motion.div variants={iconVariants} initial="hidden" animate="visible" className="mb-4">
-                            <FaUser className="text-4xl text-white" />
+                            <FaUser className="text-4xl text-gray-400" />
                         </motion.div>
-                        <h2 className="text-xl font-semibold mb-2 text-white">
+                        <h2 className="text-xl font-semibold mb-2 text-gray-700">
                             What do you want me to call you?
                         </h2>
                         <input
@@ -100,7 +103,7 @@ const PersonalInfoPage: React.FC = () => {
                             {...buttonMotion}
                             onClick={handleNext}
                             disabled={!formData.name.trim()}
-                            className="mt-6 px-4 py-2 bg-white text-green-600 font-semibold rounded disabled:opacity-50"
+                            className="mt-6 px-4 py-2 bg-green-500 text-white font-semibold rounded disabled:opacity-50"
                         >
                             Next
                         </motion.button>
@@ -120,8 +123,8 @@ const PersonalInfoPage: React.FC = () => {
                         <motion.div variants={iconVariants} initial="hidden" animate="visible" className="mb-4">
                             <FaSmileBeam className="text-4xl text-white" />
                         </motion.div>
-                        <h2 className="text-xl font-semibold mb-2 text-white">Hello, {formData.name}!</h2>
-                        <p className="mb-4 text-white">What’s your weight?</p>
+                        <h2 className="text-xl font-semibold mb-2 text-gray-700">Hello, {formData.name}!</h2>
+                        <p className="mb-4 text-gray-600">What’s your weight?</p>
                         <div className="flex flex-col items-center">
                             <input
                                 type="range"
@@ -132,14 +135,14 @@ const PersonalInfoPage: React.FC = () => {
                                 onChange={(e) => handleChange("weight", parseFloat(e.target.value))}
                                 className="w-64"
                             />
-                            <div className="mt-2 font-semibold text-white">
+                            <div className="mt-2 font-semibold text-gray-700">
                                 {formData.weight.toFixed(1)} kg
                             </div>
                         </div>
                         <motion.button
                             {...buttonMotion}
                             onClick={handleNext}
-                            className="mt-6 px-4 py-2 bg-white text-green-600 font-semibold rounded"
+                            className="mt-6 px-4 py-2 bg-green-500 text-white font-semibold rounded disabled:opacity-50"
                         >
                             Next
                         </motion.button>
@@ -311,16 +314,21 @@ const PersonalInfoPage: React.FC = () => {
     };
 
     return (
-        <div className="w-full h-screen flex flex-col justify-center items-center bg-gradient-to-r from-green-400 to-green-600 p-4 relative">
 
+        <div
+            className="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center bg-gray-100 p-4 z-48"
+        >
+            <Confetti
+                width={width}
+                height={height}
+            />
             {/* Back button on steps 1..4 */}
             {step > 0 && step < 5 && (
                 <motion.button
                     {...buttonMotion}
                     onClick={handleBack}
-                    className="absolute top-4 left-4 flex items-center gap-1 px-3 py-2 rounded text-white hover:bg-white/20 transition-colors"
-                >
-                    <FaArrowLeft className="text-white" />
+                    className="absolute top-4 left-4 flex items-center gap-1 px-3 py-2 rounded text-green-500 hover:bg-green-100 transition-colors">
+                    <FaArrowLeft className="text-green-500" />
                     <span className="font-medium">Back</span>
                 </motion.button>
             )}

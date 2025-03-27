@@ -98,7 +98,7 @@ const FoodLogs: React.FC<FoodLogsProps> = ({ isOpen, onClose, selectedDate }) =>
             </button>
 
             {/* Food Logs */}
-            <div className="px-4 py-6 space-y-4 overflow-y-auto">
+            <div className="px-8 py-10 space-y-4 overflow-y-auto">
                 {mealLog.length > 0 ? (
                     mealLog.map((meal, index) => (
                         <div

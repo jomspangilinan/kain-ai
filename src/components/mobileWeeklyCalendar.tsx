@@ -1,4 +1,4 @@
-import { format, startOfWeek, addDays, isSameDay, isToday } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay, isToday, isAfter } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
@@ -67,24 +67,34 @@ export default function WeeklyCalendar({
 
         {/* Days of the Week */}
         <div className="flex overflow-x-auto gap-2">
-          {daysOfWeek.map((day) => (
-            <div
-              key={day.toISOString()}
-              onClick={() => setSelectedDate(format(day, 'yyyy-MM-dd'))}
-              className={`relative flex flex-col items-center justify-center w-14 h-18 cursor-pointer rounded-full transition-all duration-200 ${isSameDay(day, new Date(selectedDate))
-                ? `${selectedTheme} text-white font-bold`
-                : 'text-gray-700 hover:bg-gray-200'
-                }`}
-            >
-              {/* Circle for Today */}
-              {isToday(day) && (
-                <div className="absolute bottom-1 w-2 h-2 rounded-full"
-                  style={{ backgroundColor: '#FF8989' }} />
-              )}
-              <p className="text-xs font-medium">{format(day, 'EEE')}</p>
-              <p className="text-sm font-semibold">{format(day, 'd')}</p>
-            </div>
-          ))}
+          {daysOfWeek.map((day) => {
+            const isFutureDate = isAfter(day, new Date()); // Check if the date is in the future
+
+            return (
+              <div
+                key={day.toISOString()}
+                onClick={() => {
+                  if (!isFutureDate) {
+                    setSelectedDate(format(day, 'yyyy-MM-dd'));
+                  }
+                }}
+                className={`relative flex flex-col items-center justify-center w-14 h-18 cursor-pointer rounded-full transition-all duration-200 ${isSameDay(day, new Date(selectedDate))
+                  ? `${selectedTheme} text-white font-bold`
+                  : isFutureDate
+                    ? 'text-gray-400 cursor-not-allowed' // Grayed out for future dates
+                    : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+              >
+                {/* Circle for Today */}
+                {isToday(day) && (
+                  <div className="absolute bottom-1 w-2 h-2 rounded-full"
+                    style={{ backgroundColor: '#FF8989' }} />
+                )}
+                <p className="text-xs font-medium">{format(day, 'EEE')}</p>
+                <p className="text-sm font-semibold">{format(day, 'd')}</p>
+              </div>
+            );
+          })}
         </div>
 
         {/* Next Button */}
