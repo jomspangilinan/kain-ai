@@ -55,11 +55,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
             Start with what food is it? 
             Then you break it down per 100 grams, you should specify the per 100 grams.
             I want you to use a table for breakdown:
-            | Ingredients    | Calories    | Protein    | Carbs    | Fats |
+            | Ingredients    | Calories (kcal)    | Protein(g)   | Carbs(g)  | Fats(g) |
             | -------- | ------- | ------- | ------- | ------- |
             At the end, total everything and the suggested serving size like per cup whichever is easier to understand.
             Make sure you know how the table works:
-            | Sample | Column1 | ... | ColumnN |
+            | Sample | Column1 (unit) | ... | ColumnN (unit/none) |
             | ------ | ------- | --- | ------- |
             `
           },
