@@ -12,6 +12,8 @@ import Chatbot from "./components/mobileChatbot";
 import FoodLogs from "./components/mobileFoodLogs";
 import Login from "./pages/Login";
 import { useState } from "react";
+import GoalPage from "./pages/Multistep.tsx/0Goal";
+import WeightPage from "./pages/Multistep.tsx/1Weight";
 
 
 export default function App() {
@@ -24,7 +26,7 @@ export default function App() {
   const location = useLocation();
 
   // Will be true if the current path starts with /streak
-  const hideHeaderCalendar = location.pathname.startsWith("/streak") || location.pathname.startsWith("/share");
+  const hideHeaderCalendar = location.pathname.startsWith("/streak") || location.pathname.startsWith("/share") || location.pathname.startsWith("/profile") || location.pathname.startsWith("/step");
 
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const { activeAccount } = useAuth();
@@ -51,11 +53,12 @@ export default function App() {
                 />
               }
             />
-            <Route path="/profile" element={<PersonalInfoPage />} />
+            <Route path="/profile" element={<GoalPage />} />
             <Route path="/diary" element={<SummarizeMealsWithAI />} />
             <Route path="/streak" element={<StreakPage />} />
             <Route path="/share" element={<SharePage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/step1" element={<WeightPage />} />
           </Routes>
           <FooterNavigation
             onChatbotToggle={() => setIsChatOpen(!isChatOpen)}

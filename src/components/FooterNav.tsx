@@ -20,13 +20,15 @@ const FooterNavigation: React.FC<FooterNavigationProps> = ({ onChatbotToggle, on
       </NavLink>
 
       {/* Diary Icon */}
-      <button
-        onClick={onFoodLogsToggle}
-        className='text-gray-500'
-      >
-        <FaUtensils className="text-xl" />
-        <span className="text-xs">Diary</span>
-      </button>
+      <div className="flex justify-center">
+        <button
+          onClick={onFoodLogsToggle}
+          className="text-gray-500 flex flex-col items-center"
+        >
+          <FaUtensils className="text-xl" />
+          <span className="text-xs">Food Diary</span>
+        </button>
+      </div>
 
       {/* Chatbot Button */}
       <button

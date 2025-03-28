@@ -67,6 +67,7 @@ type MealDetails = {
     }
   >
   note: string
+  userConfirmed: boolean
 }
 
 
@@ -203,8 +204,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       const botResponse = await parseMealDetailsFromResponse(lastMessage.text);
       if (!botResponse || !activeAccount) return;
       const userId = activeAccount.homeAccountId;
-      console.log(botResponse)
-      saveToCosmosDB(userId, lastMessage.imageFile ?? null, botResponse);
+      console.log(botResponse.userConfirmed, botResponse,)
+
+      if (botResponse.userConfirmed) {
+        saveToCosmosDB(userId, lastMessage.imageFile ?? null, botResponse);
+      }
     };
 
     handleNewMessage();
