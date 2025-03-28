@@ -12,8 +12,8 @@ import Chatbot from "./components/mobileChatbot";
 import FoodLogs from "./components/mobileFoodLogs";
 import Login from "./pages/Login";
 import { useState } from "react";
-import GoalPage from "./pages/Multistep.tsx/0Goal";
-import WeightPage from "./pages/Multistep.tsx/1Weight";
+import GoalPage from "./pages/Multistep/0Goal";
+import WeightPage from "./pages/Multistep/1Weight";
 
 
 export default function App() {
