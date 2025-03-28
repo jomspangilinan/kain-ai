@@ -3,7 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import Header from "./components/mobileHeader";
 import WeeklyCalendar from "./components/mobileWeeklyCalendar";
 import MobileIntegrated from "./pages/MobileFirstBot";
-import PersonalInfoPage from "./pages/PersonalInfoPage";
+//import PersonalInfoPage from "./pages/PersonalInfoPage";
 import SummarizeMealsWithAI from "./pages/SummarizeMeals";
 import StreakPage from "./pages/StreakPage";
 import SharePage from "./pages/SharePage";
