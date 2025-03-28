@@ -3,11 +3,10 @@ import { PublicClientApplication, AuthenticationResult, EventType } from "@azure
 import { MsalProvider, useMsal, } from "@azure/msal-react";
 
 
-
 const msalConfig = {
     auth: {
         clientId: import.meta.env.VITE_AZURE_APP_ID,
-        authority: import.meta.env.VITE_AZURE_AUTHORITY,
+        authority: `https://login.microsoftonline.com/${import.meta.env.VITE_AZURE_TENAND_ID}/`,
         redirectUri: '/',
         postLogoutRedirectUri: '/',
         navigateToLoginRequestUrl: true,

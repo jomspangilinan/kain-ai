@@ -12,7 +12,7 @@ import Chatbot from "./components/mobileChatbot";
 import FoodLogs from "./components/mobileFoodLogs";
 import Login from "./pages/Login";
 import { useState } from "react";
-import { useMsal } from "@azure/msal-react";
+
 
 export default function App() {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -22,9 +22,7 @@ export default function App() {
     return today.toISOString().split("T")[0];
   });
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
-  const { instance } = useMsal();
-  const activeAccount = instance.getActiveAccount();
-  console.log(activeAccount)
+  const { activeAccount } = useAuth();
 
   return (
     <div>

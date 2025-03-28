@@ -6,7 +6,14 @@ import remarkGfm from 'remark-gfm' // <-- Import remarkGfm
 import { FaPaperPlane } from 'react-icons/fa';
 import { AiFillCloseCircle } from "react-icons/ai";
 import { IoIosAttach } from "react-icons/io";
+import { useAuth } from '../context/AuthContext';
+import { BlobServiceClient } from "@azure/storage-blob";
+import imageCompression from "browser-image-compression";
 
+const blobServiceClient = new BlobServiceClient(
+  `https://kaliaistorage.blob.core.windows.net/?${import.meta.env.VITE_AZURE_SAS_TOKEN}`,
+
+);
 interface ChatbotProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,6 +23,7 @@ type Message = {
   sender: 'user' | 'bot'
   text: string
   image?: string // Optional image URL for messages
+  imageFile?: string // Optional image file name for messages
 }
 
 const endpoint = import.meta.env.VITE_AZURE_OPENAI_ENDPOINT
@@ -23,15 +31,45 @@ const apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY
 const deployment = import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT_ID
 const apiVersion = "2024-05-01-preview"
 
-const searchIndex = import.meta.env.VITE_AZURE_SEARCH_INDEX_NAME
-const searchEndpoint = import.meta.env.VITE_AZURE_SEARCH_ENDPOINT
-const searchKey = import.meta.env.VITE_AZURE_SEARCH_KEY
-
 if (!endpoint || !apiKey || !deployment) {
   throw new Error("Missing Azure OpenAI configuration in environment variables.")
 }
 
 const openAiClient = new AzureOpenAI({ endpoint, apiKey, apiVersion, deployment, dangerouslyAllowBrowser: true })
+
+const getClient = () => {
+  const assistantsClient = new AzureOpenAI({
+    endpoint: import.meta.env.VITE_AZURE_OPENAI_ENDPOINT_ASSISTANT,
+    apiVersion: apiVersion,
+    apiKey: apiKey,
+    dangerouslyAllowBrowser: true
+  });
+  return assistantsClient;
+};
+const assistantsClient = getClient();
+
+type MealDetails = {
+  description: string
+  dish: string
+  per100grams: {
+    calories: string
+    protein: string
+    fat: string
+    carbohydrates: string
+  }
+  ingredientsBreakdown: Record<
+    string,
+    {
+      calories: string
+      protein: string
+      fat: string
+      carbohydrates: string
+    }
+  >
+  note: string
+}
+
+
 
 const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState<Message[]>([])
@@ -39,6 +77,140 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isTyping, setIsTyping] = useState<boolean>(false)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const { activeAccount } = useAuth();
+  const [file, setFile] = useState<File | null>(null)
+
+
+
+  const uploadImageToBlob = async (userId: string, file: File) => {
+    try {
+      const containerName = "img"; // Replace with your container name
+      const containerClient = blobServiceClient.getContainerClient(containerName);
+
+      // Ensure the container exists
+      await containerClient.createIfNotExists();
+
+      // Generate a unique filename
+      const timestamp = Date.now();
+      const fileName = `${userId}/${timestamp}-${file.name}`;
+
+      // Get a block blob client
+      const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+
+      // Upload the file
+      await blockBlobClient.uploadBrowserData(file, {
+        blobHTTPHeaders: { blobContentType: file.type }, // Set the content type
+      });
+
+      // Return the URL of the uploaded file
+      console.log('imgurl', blockBlobClient.url)
+      return { url: blockBlobClient.url, fileName: fileName };
+    } catch (error) {
+      console.error("Error uploading image to Blob Storage:", error);
+      throw error;
+    }
+  };
+  const parseMealDetailsFromResponse = async (botResponse: string): Promise<MealDetails | null> => {
+    try {
+      const thread = await assistantsClient.beta.threads.create({})
+
+      await assistantsClient.beta.threads.messages.create(thread.id, {
+        role: 'user',
+        content: botResponse
+      })
+
+      const run = await assistantsClient.beta.threads.runs.create(thread.id, {
+        assistant_id: 'asst_tcEhamx1wcvfk3crPJl6j1UX',
+      })
+
+      // Poll until complete
+      let status = run.status
+      while (status === 'queued' || status === 'in_progress') {
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        const runStatus = await assistantsClient.beta.threads.runs.retrieve(thread.id, run.id)
+        status = runStatus.status
+      }
+
+      if (status !== 'completed') {
+        console.warn('Run did not complete successfully:', status)
+        return null
+      }
+
+      const messages = await assistantsClient.beta.threads.messages.list(thread.id)
+
+      // 🧠 Find the assistant's response (not the user's message)
+      const assistantMessage = messages.data.find((msg) => msg.role === 'assistant')
+
+      console.log(assistantMessage)
+      if (!assistantMessage) {
+        console.warn('No assistant message found.')
+        return null
+      }
+
+      const textBlock = assistantMessage.content.find((block) => block.type === 'text')
+
+      const messageText = textBlock?.text?.value
+
+      if (!messageText) return null
+      const cleanJson = messageText.replace(/```(?:json)?|```/g, '').trim()
+      return JSON.parse(cleanJson)
+    } catch (err) {
+      console.error('Error parsing with Assistant:', err)
+      return null
+    }
+  }
+  const saveToCosmosDB = async (userId: string, imageUrl: string | null, botResponse: MealDetails) => {
+    try {
+      // Create the document to save
+      const document: any = {
+        userId,
+        category: 'meal',
+        botResponse,
+        timestamp: new Date().toISOString(), // Add a timestamp
+      };
+
+      // Include imageUrl only if it's provided
+      if (imageUrl) {
+        document.imageUrl = imageUrl;
+      }
+
+      // Send the document to the backend
+      const response = await fetch("http://localhost:5000/api/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(document),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save data to Cosmos DB");
+      }
+
+      const data = await response.json();
+      console.log("Saved to Cosmos DB:", data);
+    } catch (error) {
+      console.error("Error saving to Cosmos DB:", error);
+    }
+  };
+
+  useEffect(() => {
+    const handleNewMessage = async () => {
+      if (messages.length === 0) return; // Skip if there are no messages
+      if (messages[messages.length - 1].sender === 'user') return; // Skip if the last message is from the bot
+
+      const lastMessage = messages[messages.length - 1];
+      const botResponse = await parseMealDetailsFromResponse(lastMessage.text);
+      if (!botResponse || !activeAccount) return;
+      const userId = activeAccount.homeAccountId;
+      console.log(botResponse)
+      saveToCosmosDB(userId, lastMessage.imageFile ?? null, botResponse);
+    };
+
+    handleNewMessage();
+  }, [messages]); // Trigger whenever `messages` changes
+
+
 
   const sendMessage = async () => {
     if (!input.trim() && !imagePreview) return
@@ -61,7 +233,7 @@ Protein (g)
 Carbs (g)
 Fats (g)
 Offer a total suggested serving size in a measure that is easy to understand (e.g., per cup, per serving).
-The chatbot should produce a concise table in this format (or a variant that includes the necessary details):
+The chatbot should produce in this format (or a variant that includes the necessary details):
 [Name of food] [Food per 100g ]
 - Calories (kcal)
 - Protein (g)
@@ -69,7 +241,9 @@ The chatbot should produce a concise table in this format (or a variant that inc
 - Fats (g)
 If the item is not definitively Filipino, simply return a general term for the dish or ingredient.
 
-Tell the user, you've added it to the food log diary, and can check the breakdown there.
+Ask the user,If the user wants to add it to the food log diary, finish the conversation and tell that you've added it to the food log diary with breakdown.
+Chat History:
+${messages.map((msg) => `${msg.sender}: ${msg.text}`).join('\n')}
             `
           },
           {
@@ -93,6 +267,29 @@ Tell the user, you've added it to the food log diary, and can check the breakdow
         })
       }
 
+
+      if (!activeAccount) {
+        throw new Error("User is not authenticated.");
+      }
+
+      // Compress the image
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true,
+      };
+
+      let imageFile = undefined;
+      if (file) {
+        const compressedFile = await imageCompression(file, options);
+
+        // Use activeAccount.homeAccountId or activeAccount.username as the unique user ID
+        const userId = activeAccount.homeAccountId;
+
+        // Upload the compressed image to Blob Storage
+        imageFile = await uploadImageToBlob(userId, compressedFile);
+      }
+
       const completion = await openAiClient.chat.completions.create({
         model: 'gpt-4o-2024-05-13',
         ...payload,
@@ -103,8 +300,15 @@ Tell the user, you've added it to the food log diary, and can check the breakdow
         stop: null
       })
 
+      console.log(payload)
       const botReply = completion.choices?.[0]?.message?.content?.trim() || 'I could not process your request.'
-      setMessages((prev) => [...prev, { sender: 'bot', text: botReply }])
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', text: botReply, imageFile: imageFile?.fileName },
+      ]);
+
+
+
     } catch (error) {
       console.error('Error communicating with Azure OpenAI:', error)
       setMessages((prev) => [...prev, { sender: 'bot', text: 'Something went wrong. Please try again.' }])
@@ -117,23 +321,27 @@ Tell the user, you've added it to the food log diary, and can check the breakdow
     if (e.key === 'Enter') sendMessage()
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+
       const imageUrl = URL.createObjectURL(file)
+      setFile(file)
       setImagePreview(imageUrl)
       e.target.value = ''
     }
   }
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+  const handlePaste = async (e: React.ClipboardEvent<HTMLInputElement>) => {
     const items = e.clipboardData.items
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const file = item.getAsFile()
         if (file) {
+
           const imageUrl = URL.createObjectURL(file)
           setImagePreview(imageUrl)
+          setFile(file)
         }
       }
     }

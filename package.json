@@ -10,14 +10,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@azure/cosmos": "^4.3.0",
     "@azure/identity": "^4.8.0",
     "@azure/msal-browser": "^4.9.1",
     "@azure/msal-react": "^3.0.8",
     "@azure/openai": "^2.0.0",
+    "@azure/storage-blob": "^12.27.0",
     "@tailwindcss/vite": "^4.0.17",
+    "browser-image-compression": "^2.0.2",
     "chart.js": "^4.4.8",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "framer-motion": "^12.6.2",
     "install": "^0.13.0",
     "npm": "^11.2.0",
@@ -51,5 +56,17 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.0"
-  }
+  },
+  "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
+  "main": "eslint.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jomspangilinan/kain-ai.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jomspangilinan/kain-ai/issues"
+  },
+  "homepage": "https://github.com/jomspangilinan/kain-ai#readme"
 }
