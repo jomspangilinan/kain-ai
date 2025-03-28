@@ -175,7 +175,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       }
 
       // Send the document to the backend
-      const response = await fetch("http://localhost:5000/api/save", {
+      const response = await fetch("/api/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

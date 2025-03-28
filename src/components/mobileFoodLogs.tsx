@@ -39,7 +39,7 @@ const FoodLogs: React.FC<FoodLogsProps> = ({ isOpen, onClose, selectedDate }) =>
                 if (!activeAccount) return;
                 const userId = activeAccount.homeAccountId;
                 const response = await fetch(
-                    `http://localhost:5000/api/foodlogs?userId=${userId}&date=${selectedDate}`
+                    `/api/foodlogs?userId=${userId}&date=${selectedDate}`
                 );
 
                 if (!response.ok) {
