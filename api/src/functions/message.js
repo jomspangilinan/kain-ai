@@ -1,4 +1,16 @@
 const { app } = require('@azure/functions');
+const { CosmosClient } = require('@azure/cosmos');
+if (!process.env.COSMOS_DB_KEY) {
+    throw new Error("COSMOS_DB_KEY environment variable is not set.");
+}
+
+const cosmosClient = new CosmosClient({
+    endpoint: 'https://kaliaihackathon.documents.azure.com:443/',
+    key: process.env.COSMOS_DB_KEY,
+});
+
+const databaseId = "kaliaidb";
+const containerId = "meals";
 
 app.http('message', {
     methods: ['GET', 'POST'],
