@@ -2,7 +2,7 @@ const { app } = require('@azure/functions');
 const { CosmosClient } = require('@azure/cosmos');
 
 // Expect these environment variables to be set
-const endpoint = process.env.COSMOS_DB_ENDPOINT;
+const endpoint = 'https://kaliaihackathon.documents.azure.com:443/';
 const key = process.env.COSMOS_DB_KEY;
 
 if (!endpoint || !key) {
