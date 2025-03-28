@@ -50,7 +50,8 @@ export async function foodLogs(request: HttpRequest, context: InvocationContext)
         // Return the results
         return {
             status: 200,
-            body: resources,
+            body: JSON.stringify(resources), // Serialize the response to JSON
+            headers: { "Content-Type": "application/json" }, // Set the Content-Type header
         };
     } catch (error) {
         context.log("Error retrieving food logs from Cosmos DB:", error);

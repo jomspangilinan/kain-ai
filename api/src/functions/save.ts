@@ -53,7 +53,11 @@ export async function save(request: HttpRequest, context: InvocationContext): Pr
         const { resource } = await container.items.create(document);
 
         context.log(`Document saved successfully: ${JSON.stringify(resource)}`);
-        return { body: `Document saved successfully!`, status: 200 };
+        return {
+            status: 200,
+            body: JSON.stringify('{saved!!}'), // Serialize the response to JSON
+            headers: { "Content-Type": "application/json" }, // Set the Content-Type header
+        };
     } catch (error) {
         context.log("Error saving to Cosmos DB:", error);
         return {
