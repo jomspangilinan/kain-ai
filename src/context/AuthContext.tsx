@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext } from "react";
 import { PublicClientApplication, AuthenticationResult, EventType } from "@azure/msal-browser";
-import { MsalProvider, useMsal, } from "@azure/msal-react";
+import { MsalProvider, } from "@azure/msal-react";
 
 
 const msalConfig = {
