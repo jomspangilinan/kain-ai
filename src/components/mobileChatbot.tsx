@@ -205,8 +205,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
       if (!botResponse || !activeAccount) return;
       const userId = activeAccount.homeAccountId;
       console.log(botResponse.userConfirmed, botResponse,)
-
-      if (Boolean(botResponse.userConfirmed)) {
+      if (String(botResponse.userConfirmed).toLowerCase() === "true") {
         saveToCosmosDB(userId, lastMessage.imageFile ?? null, botResponse);
       }
     };
