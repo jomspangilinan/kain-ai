@@ -1,9 +1,9 @@
 const { app } = require('@azure/functions');
 const { CosmosClient } = require('@azure/cosmos');
-
+require('dotenv').config();
 // Expect these environment variables to be set
 const endpoint = 'https://kaliaihackathon.documents.azure.com:443/';
-const key = 'TEST';
+const key = process.env.COSMOS_DB_KEY;
 
 if (!endpoint || !key) {
     throw new Error("Please set COSMOS_DB_ENDPOINT and COSMOS_DB_KEY environment variables.");
