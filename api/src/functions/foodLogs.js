@@ -1,5 +1,9 @@
 const { app } = require('@azure/functions');
 const { CosmosClient } = require('@azure/cosmos');
+
+require('dotenv').config();
+
+
 if (!process.env.COSMOS_DB_KEY) {
     throw new Error("COSMOS_DB_KEY environment variable is not set.");
 }
