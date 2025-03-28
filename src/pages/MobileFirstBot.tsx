@@ -9,6 +9,7 @@ import { mockData } from '../data/mockData';
 //import Chatbot from '../components/mobileChatbot';
 //import Header from '../components/mobileHeader';
 import GoalAndMacrosTracker from '../components/GoalTracker';
+import { useFoodLogs } from '../context/FoodLogsContext';
 
 
 interface MobileIntegratedProps {
@@ -18,7 +19,7 @@ interface MobileIntegratedProps {
 
 
 export default function MobileIntegrated({ selectedDate, daysOfWeek }: MobileIntegratedProps) {
-
+  const { totalProximate } = useFoodLogs();
   const data = mockData[selectedDate as keyof typeof mockData] || mockData['2025-03-26'];
 
   const getWeightsForDays = (daysOfWeek: string[]) => {
@@ -35,13 +36,26 @@ export default function MobileIntegrated({ selectedDate, daysOfWeek }: MobileInt
     });
   };
 
-
+  const updatedMacros = {
+    carbs: {
+      consumed: totalProximate.carbohydrates,
+      total: data.macros.carbs.total,
+    },
+    protein: {
+      consumed: totalProximate.protein,
+      total: data.macros.protein.total,
+    },
+    fat: {
+      consumed: totalProximate.fat,
+      total: data.macros.fat.total,
+    },
+  };
   return (
     <div className="bg-gray-100 flex flex-col">
       <GoalAndMacrosTracker
-        caloriesConsumed={data.goal.caloriesConsumed}
+        caloriesConsumed={totalProximate.calories}
         calorieGoal={data.goal.calorieGoal}
-        macros={data.macros}
+        macros={updatedMacros}
       />
       <Charts weight={getWeightsForDays(daysOfWeek)} calorie={getCaloriesForDays(daysOfWeek)} selectedDate={selectedDate} />
 

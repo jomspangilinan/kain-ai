@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { FaTrashAlt } from "react-icons/fa";
 import { AiFillCloseCircle } from "react-icons/ai";
 import { FaUtensils } from "react-icons/fa";
+import { useFoodLogs } from "../context/FoodLogsContext";
 
-
-interface Meal {
-    meal: string;
-    calories: string;       // e.g. "120" (or "120 kcal" before we clean it)
-    protein: string;        // e.g. "9"   (or "9 g" before we clean it)
-    fat: string;            // e.g. "5"
-    carbohydrates: string;  // e.g. "10"
-    image: string;
-    ingredientsBreakdown?: Record<
-        string,
-        { calories: string; protein: string; fat: string; carbohydrates: string }
-    >;
-    serving: string;
-}
 
 interface FoodLogsProps {
     isOpen: boolean;
@@ -25,71 +12,19 @@ interface FoodLogsProps {
 }
 
 const FoodLogs: React.FC<FoodLogsProps> = ({ isOpen, onClose, selectedDate }) => {
-    const [mealLog, setMealLog] = useState<Meal[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
     const [expandedMealIndex, setExpandedMealIndex] = useState<number | null>(null);
-    const { activeAccount } = useAuth();
+    const { mealLog, loading, fetchFoodLogs, deleteFoodLog } = useFoodLogs();
+    const [_, setIsProcessing] = useState<boolean>(false);
 
     useEffect(() => {
-        const fetchFoodLogs = async () => {
-            setLoading(true);
-            try {
-                if (!activeAccount) return;
-                const userId = activeAccount.homeAccountId;
-                const response = await fetch(
-                    `/api/foodlogs?userId=${userId}&date=${selectedDate}`
-                );
+        fetchFoodLogs(selectedDate);
+    }, [isOpen, selectedDate, fetchFoodLogs, setIsProcessing]);
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch food logs");
-                }
-                const data = await response.json();
-
-                // Transform & strip any double units in the data
-                const transformedData = data.map((log: any) => {
-                    const perServing = log.botResponse.total;
-                    return {
-                        meal: log.botResponse.dish,
-                        calories: perServing.calories,
-                        protein: perServing.protein,
-                        fat: perServing.fat,
-                        carbohydrates: perServing.carbohydrates,
-                        image: log.imageUrl
-                            ? `https://kaliaistorage.blob.core.windows.net/img/${log.imageUrl}?${import.meta.env.VITE_AZURE_SAS_TOKEN}`
-                            : null,
-                        serving: perServing.serving,
-                        ingredientsBreakdown: log.botResponse.ingredientsBreakdown
-                            ? Object.fromEntries(
-                                Object.entries(log.botResponse.ingredientsBreakdown).map(
-                                    ([ingredient, details]: [string, any]) => [
-                                        ingredient,
-                                        {
-                                            calories: details.calories,
-                                            protein: details.protein,
-                                            fat: details.fat,
-                                            carbohydrates: details.carbohydrates,
-                                        },
-                                    ]
-                                )
-                            )
-                            : undefined,
-                    };
-                });
-
-                setMealLog(transformedData);
-            } catch (error) {
-                console.error("Error fetching food logs:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchFoodLogs();
-    }, [selectedDate]);
 
     const toggleExpand = (index: number) => {
         setExpandedMealIndex(expandedMealIndex === index ? null : index);
     };
+
 
     return (
         <div
@@ -143,13 +78,22 @@ const FoodLogs: React.FC<FoodLogsProps> = ({ isOpen, onClose, selectedDate }) =>
                                             🍗 Protein: {meal.protein}
                                         </span>
                                         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-yellow-100 text-yellow-600 rounded-full">
-                                            🧈 Fat: {meal.fat} g
+                                            🧈 Fat: {meal.fat}
                                         </span>
                                         <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-green-100 text-green-600 rounded-full">
                                             🍞 Carbs: {meal.carbohydrates}
                                         </span>
                                     </div>
                                 </div>
+
+                                {/* Delete Button */}
+                                <button
+                                    onClick={() => deleteFoodLog(meal.id)} // Pass the meal ID to the delete function// or meal.id if using ids
+                                    className="text-red-400 hover:text-red-600 transition"
+                                    title="Delete"
+                                >
+                                    <FaTrashAlt size={20} />
+                                </button>
                             </div>
 
                             {/* Expandable Section */}
