@@ -8,10 +8,10 @@ const StreakPage = () => {
     const today = new Date().toISOString().split('T')[0];
 
     return (
-        <div className="max-w-md mx-auto py-6 px-4 relative">
+        <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-y-auto">
             {/* Close Button */}
             <NavLink to="/">
-                <div className="absolute top-8 right-6 text-white hover:text-green-700">
+                <div className="absolute top-4 right-4 text-white hover:text-green-700">
                     <AiFillCloseCircle size={24} />
                 </div>
             </NavLink>

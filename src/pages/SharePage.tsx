@@ -22,10 +22,10 @@ const SharePage = () => {
     };
 
     return (
-        <div className="max-w-md mx-auto py-6 px-4">
+        <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-y-auto">
             {/* Close Button */}
             <NavLink to="/">
-                <div className="absolute top-8 right-6 text-white hover:text-green-700">
+                <div className="absolute top-4 right-4 text-white hover:text-green-700">
                     <AiFillCloseCircle size={24} />
                 </div>
             </NavLink>

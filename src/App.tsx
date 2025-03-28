@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import Header from "./components/mobileHeader";
 import WeeklyCalendar from "./components/mobileWeeklyCalendar";
@@ -21,6 +21,11 @@ export default function App() {
     const today = new Date();
     return today.toISOString().split("T")[0];
   });
+  const location = useLocation();
+
+  // Will be true if the current path starts with /streak
+  const hideHeaderCalendar = location.pathname.startsWith("/streak") || location.pathname.startsWith("/share");
+
   const [daysOfWeek, setDaysOfWeek] = useState<string[]>([]);
   const { activeAccount } = useAuth();
 
@@ -30,12 +35,12 @@ export default function App() {
         <Login />
       ) : (
         <>
-          <Header />
-          <WeeklyCalendar
+          {!hideHeaderCalendar && <Header />}
+          {!hideHeaderCalendar && <WeeklyCalendar
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             setDaysOfWeek={setDaysOfWeek}
-          />
+          />}
           <Routes>
             <Route
               path="/"
