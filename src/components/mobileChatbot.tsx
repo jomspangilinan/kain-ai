@@ -23,6 +23,10 @@ const apiKey = import.meta.env.VITE_AZURE_OPENAI_API_KEY
 const deployment = import.meta.env.VITE_AZURE_OPENAI_DEPLOYMENT_ID
 const apiVersion = "2024-05-01-preview"
 
+const searchIndex = import.meta.env.VITE_AZURE_SEARCH_INDEX_NAME
+const searchEndpoint = import.meta.env.VITE_AZURE_SEARCH_ENDPOINT
+const searchKey = import.meta.env.VITE_AZURE_SEARCH_KEY
+
 if (!endpoint || !apiKey || !deployment) {
   throw new Error("Missing Azure OpenAI configuration in environment variables.")
 }
@@ -50,17 +54,22 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
         messages: [
           {
             role: 'system',
-            content: `You are a nutritionist. 
-            You need to breakdown the ingredients calories and macros of all the food I will be sending to you using Filipino food exchange list. 
-            Start with what food is it? 
-            Then you break it down per 100 grams, you should specify the per 100 grams.
-            I want you to use a table for breakdown:
-            | Ingredients    | Calories (kcal)    | Protein(g)   | Carbs(g)  | Fats(g) |
-            | -------- | ------- | ------- | ------- | ------- |
-            At the end, total everything and the suggested serving size like per cup whichever is easier to understand.
-            Make sure you know how the table works:
-            | Sample | Column1 (unit) | ... | ColumnN (unit/none) |
-            | ------ | ------- | --- | ------- |
+            content: `You are a nutritionist, and you are to determine or infer the Filipino food item (or a general term if it is not Filipino) from the user’s image or description.
+Next, provide the combined grams and proximates of the food (per 100g basis), including:
+Calories (kcal)
+Protein (g)
+Carbs (g)
+Fats (g)
+Offer a total suggested serving size in a measure that is easy to understand (e.g., per cup, per serving).
+The chatbot should produce a concise table in this format (or a variant that includes the necessary details):
+[Name of food] [Food per 100g ]
+- Calories (kcal)
+- Protein (g)
+- Carbs (g)
+- Fats (g)
+If the item is not definitively Filipino, simply return a general term for the dish or ingredient.
+
+Tell the user, you've added it to the food log diary, and can check the breakdown there.
             `
           },
           {
@@ -91,7 +100,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
         top_p: 0.95,
         frequency_penalty: 0,
         presence_penalty: 0,
-        stop: null,
+        stop: null
       })
 
       const botReply = completion.choices?.[0]?.message?.content?.trim() || 'I could not process your request.'
@@ -168,10 +177,11 @@ const Chatbot: React.FC<ChatbotProps> = ({ isOpen, onClose }) => {
           >
             {msg.sender === 'bot' ? (
               // Use the remarkGfm plugin to render tables, strikethrough, etc.
-              <div className="markdown">
+              <div className="markdown break-words overflow-x-auto">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {msg.text}
-                </ReactMarkdown></div>
+                </ReactMarkdown>
+              </div>
             ) : (
               msg.text
             )}

@@ -16,7 +16,7 @@ import Picker from 'react-mobile-picker'
 type LifestyleOption = "sedentary" | "lightlyActive" | "active" | "veryActive";
 
 const PersonalInfoPage: React.FC = () => {
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(1);
     const { width, height } = useWindowSize()
     const [formData, setFormData] = useState({
         name: "",
@@ -157,7 +157,7 @@ const PersonalInfoPage: React.FC = () => {
                                 {formData.weight.toFixed(1)} kg
                             </div>
                         </div>
-                        <Picker value={pickerValue} onChange={setPickerValue}>
+                        <Picker className="text-xl" value={pickerValue} onChange={setPickerValue}>
                             {Object.keys(selections).map((name) => (
                                 <Picker.Column key={name} name={name}>
                                     {selections[name as keyof typeof selections].map((option) => (
